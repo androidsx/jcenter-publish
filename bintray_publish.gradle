@@ -1,0 +1,134 @@
+/**
+ * Use this plugin to publish an Android library in the jCenter repository via BinTray.
+ *
+ * JCenter is the default repository with the Android's gradle plugin. It is a superset
+ * of the good old Maven Central repository. Also, this process is remarkably less cumbersome
+ * than the Maven way.
+ *
+ * HOW TO
+ *
+ * To publish a new library:
+ *
+ * 1. Create an account at bintray.com
+ * 2. From the website, add a new package in your maven repository, with the name of your artifact
+ * 3. Configure your "ext" block as indicated in CONFIGURATION
+ * 4. Execute the Gradle task as indicated in USAGE
+ * 5. In a few hours, you will get a message from bintray authorising it
+ *
+ * To publish a new version of an existing library:
+ *
+ * 1. Update the version number
+ * 2. Execute the Gradle task as indicated in USAGE
+ *
+ * USAGE
+ *
+ * To publish a new library, or a new version of an existing library, just execute this command
+ * from the module directory:
+ *
+ *     ../gradlew bintrayUpload
+ *
+ * CONFIGURATION
+ *
+ * Add this this plugin by adding this line in your module's build.gradle:
+ *
+ *     apply from: '../bintray_publish.gradle'
+ *
+ * To pass the parameters in, use an "ext" block somewhere in your module's build.gradle. Use
+ * this as a template:
+ *
+ * <pre>
+     ext {
+         // Library identifier. Your final dependency will be `group:artifact:version
+         libraryGroup = 'com.mycompany'
+         libraryArtifact = 'my-fancy-library'
+         libraryVersion = '1.0.0'
+
+         // Optional Maven parameters to build the pom.xml
+         libraryDescription = 'This library does this and that'
+         librarySiteUrl = 'https://github.com/mycompany/my-fancy-library'
+         libraryGitUrl = 'https://github.com/mycompany/my-fancy-library.git'
+         libraryLicense = {
+             name 'MIT'
+             url 'http://opensource.org/licenses/MIT'
+         }
+         libraryDevelopers = {
+             developer {
+                 id 'my-github-name'
+                 name 'My Name'
+                 email 'me@example.com'
+             }
+         }
+
+         // Credentials in Bintray. In a "bintray.properties" file that's ignored in Git
+         Properties properties = new Properties()
+         properties.load(project.rootProject.file('bintray.properties').newDataInputStream())
+         bintrayUser = properties.getProperty('bintray.user') // Yes, you need to create an account at bintray.com
+         bintrayApiKey = properties.getProperty('bintray.apikey') // Find it in your profile settings at bintray.com
+     }
+ </pre>
+ *
+ * MORE INFORMATION
+ *
+ * Great blog post: https://www.virag.si/2015/01/publishing-gradle-android-library-to-jcenter/
+ * Official Bintray plugin, that this plugin here wraps: https://github.com/bintray/gradle-bintray-plugin
+ */
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+version = libraryVersion
+group = libraryGroup
+
+bintray {
+    user = bintrayUser
+    key = bintrayApiKey
+
+    configurations = ['archives']
+    pkg {
+        repo = "maven"
+        name =  libraryArtifact
+        websiteUrl = librarySiteUrl
+        vcsUrl = libraryGitUrl
+        licenses = [libraryLicense.name]
+        publish = true
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                name libraryDescription
+                url librarySiteUrl
+                licenses {
+                    license libraryLicense
+                }
+                developers libraryDevelopers
+                scm {
+                    connection libraryGitUrl
+                    developerConnection libraryGitUrl
+                    url librarySiteUrl
+                }
+            }
+        }
+    }
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
