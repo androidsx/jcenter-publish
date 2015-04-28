@@ -1,0 +1,1 @@
+Gradle plugin to publish an Android library into jCenter via BinTray.
