@@ -13,6 +13,8 @@
  * 2. From the website, add a new package in your maven repository, with the name of your artifact
  * 3. Configure your "ext" block as indicated in CONFIGURATION
  * 4. Execute the Gradle task as indicated in USAGE
+ * 5. Find your library and version appear in your Bintray repo, such as https://bintray.com/espinchi/maven/pixalytics-core/view
+ * 6. Publish it in the JCenter repository by clicking on the "Include My Package" button
  * 5. In a few hours, you will get a message from bintray authorising it
  *
  * To publish a new version of an existing library:
