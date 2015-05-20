@@ -7,7 +7,7 @@
  *
  * HOW TO
  *
- * To publish a new library:
+ * To publish a new library (this is the first-time-only setup):
  *
  * 1. Create an account at bintray.com
  * 2. From the website, add a new package in your maven repository, with the name of your artifact
@@ -17,10 +17,14 @@
  * 6. Publish it in the JCenter repository by clicking on the "Include My Package" button
  * 5. In a few hours, you will get a message from bintray authorising it
  *
- * To publish a new version of an existing library:
+ * To publish a new version of an existing library (from here on)
  *
  * 1. Update the version number
  * 2. Execute the Gradle task as indicated in USAGE
+ *
+ * To publish a new version of an existing library of a different author (not too common): follow the steps as if you were
+ * publishing a new library. You will be publishing into your own bintray account. From there, you'll have to publish into
+ * JCenter from the web interface (step 6 above).
  *
  * USAGE
  *
